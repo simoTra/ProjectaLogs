@@ -9,7 +9,6 @@ export class CreateProjectDto {
   @IsString()
   description: string;
 
-  @IsNotEmpty()
   @IsNumber()
   clientId: number;
 }
