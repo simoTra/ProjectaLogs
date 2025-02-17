@@ -1,3 +1,4 @@
+import { Printer } from 'src/printer/entities/printer.entity';
 import { Project } from 'src/project/entities/project.entity';
 import { PrimaryGeneratedColumn, Column, Entity, ManyToOne } from 'typeorm';
 @Entity()
@@ -57,6 +58,11 @@ export class Job {
     onDelete: 'CASCADE',
     nullable: true,
   })
-  
   project: Project;
+
+  @ManyToOne(() => Printer, (printer) => printer.jobs, {
+    onDelete: 'SET NULL',
+    nullable: true,
+  })
+  printer: Printer;
 }

@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  ParseIntPipe,
+} from '@nestjs/common';
 import { ClientService } from './client.service';
 import { CreateClientDto } from './dto/create-client.dto';
 import { UpdateClientDto } from './dto/update-client.dto';
@@ -9,8 +18,8 @@ export class ClientController {
   constructor(private readonly clientService: ClientService) {}
 
   @Post()
-  create(@Body() CreateClientDto: CreateClientDto): Promise<Client> {
-    return this.clientService.create(CreateClientDto);
+  create(@Body() createClientDto: CreateClientDto): Promise<Client> {
+    return this.clientService.create(createClientDto);
   }
 
   @Get()
@@ -28,7 +37,6 @@ export class ClientController {
     @Param('id', ParseIntPipe) id: number,
     @Body() updateClientDto: UpdateClientDto,
   ): Promise<Client> {
-    console.log('updateClientDto', updateClientDto);
     return this.clientService.update(+id, updateClientDto);
   }
 

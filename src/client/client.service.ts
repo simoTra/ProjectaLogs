@@ -80,19 +80,10 @@ export class ClientService {
   }
 
   async remove(id: number): Promise<void> {
-    const client = await this.clientRepository.findOne({
-      where: { id },
-      relations: ['projects'],
-    });
+    const result = await this.clientRepository.delete(id);
 
-    if (!client) {
-      throw new Error(`Client with ID ${id} not found`);
+    if (result.affected === 0) {
+      throw new NotFoundException(`Project with ID ${id} not found`);
     }
-
-    if (client.projects && client.projects.length > 0) {
-      await this.projectRepository.delete(client.projects.map((p) => p.id));
-    }
-
-    await this.clientRepository.delete(id);
   }
 }

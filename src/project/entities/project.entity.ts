@@ -6,7 +6,6 @@ import {
   Entity,
   ManyToOne,
   OneToMany,
-  JoinColumn,
 } from 'typeorm';
 
 @Entity()
@@ -21,7 +20,7 @@ export class Project {
   description: string;
 
   @ManyToOne(() => Client, (client) => client.projects, {
-    onDelete: 'CASCADE',
+    onDelete: 'SET NULL',
     nullable: true,
   })
   client: Client;

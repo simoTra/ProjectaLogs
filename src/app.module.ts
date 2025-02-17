@@ -10,6 +10,8 @@ import { ClientModule } from './client/client.module';
 import { Client } from './client/entities/client.entity';
 import { JobModule } from './job/job.module';
 import { Job } from './job/entities/job.entity';
+import { PrinterModule } from './printer/printer.module';
+import { Printer } from './printer/entities/printer.entity';
 
 @Module({
   imports: [
@@ -19,13 +21,14 @@ import { Job } from './job/entities/job.entity';
       useFactory: (configService: ConfigService) => ({
         type: 'sqlite',
         database: 'projectalogs-db.sqlite',
-        entities: [Project, Client, Job],
+        entities: [Project, Client, Job, Printer],
         synchronize: true,
       }),
     }),
     ProjectModule,
     ClientModule,
     JobModule,
+    PrinterModule,
   ],
   controllers: [AppController],
   providers: [AppService],

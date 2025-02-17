@@ -18,7 +18,7 @@ export class JobController {
     return this.jobService.findAll();
   }
 
-  @Get(':id')
+  @Get('/get/:id')
   findOne(@Param('id') id: number): Promise<Job> {
     return this.jobService.findOne(id);
   }
@@ -31,5 +31,13 @@ export class JobController {
   @Delete(':id')
   remove(@Param('id') id: number): Promise<void> {
     return this.jobService.remove(id);
+  }
+
+
+  @Get('/sync')
+  async syncJobs(): Promise<string> {
+    const url = 'http://100.113.166.1/printers/1557981001/fluidd/server/history/list';
+    await this.jobService.fetchAndSaveJobsFromPrinter(url);
+    return 'Jobs fetched and saved successfully';
   }
 }
