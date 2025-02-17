@@ -1,6 +1,13 @@
 import { Client } from 'src/client/entities/client.entity';
 import { Job } from 'src/job/entities/job.entity';
-import { PrimaryGeneratedColumn, Column, Entity, ManyToOne, OneToMany } from 'typeorm';
+import {
+  PrimaryGeneratedColumn,
+  Column,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  JoinColumn,
+} from 'typeorm';
 
 @Entity()
 export class Project {
@@ -10,12 +17,15 @@ export class Project {
   @Column()
   name: string;
 
-  @Column()
+  @Column({ nullable: true })
   description: string;
 
-  @ManyToOne(() => Client, (client) => client.projects, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Client, (client) => client.projects, {
+    onDelete: 'CASCADE',
+    nullable: true,
+  })
   client: Client;
 
-  @OneToMany(() => Job, (job) => job.project)
+  @OneToMany(() => Job, (job) => job.project, { nullable: true })
   jobs: Job[];
 }

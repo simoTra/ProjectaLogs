@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateClientDto } from './dto/create-client.dto';
 import { UpdateClientDto } from './dto/update-client.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -16,9 +16,15 @@ export class ClientService {
   ) {}
 
   async create(createClientDto: CreateClientDto): Promise<Client> {
-    const client = new Client();
-    client.name = createClientDto.name;
+    const { ...clientData } = createClientDto;
+    
+    if (createClientDto.projects) {
+      if (Object.keys(createClientDto.projects).length === 0) {
+        clientData.projects = null;
+      }
+    }
 
+    const client = this.clientRepository.create({ ...clientData });
     return this.clientRepository.save(client);
   }
 
@@ -46,7 +52,7 @@ export class ClientService {
     });
 
     if (!client) {
-      throw new Error(`Client with ID ${id} not found`);
+      throw new NotFoundException(`Client with ID ${id} not found`);
     }
 
     if (updateClientDto.name) {
@@ -54,11 +60,20 @@ export class ClientService {
     }
 
     if (updateClientDto.projects) {
-      const projects = await this.projectRepository.findBy({
-        id: In(updateClientDto.projects.map((p) => p.id)),
-      });
-      console.log(projects);
-      client.projects = projects;
+      if (updateClientDto.projects.length === 0) {
+        client.projects = null;
+      } else {
+        const projectIds = updateClientDto.projects.map((p) => p.id);
+        const projects = await this.projectRepository.findBy({
+          id: In(projectIds),
+        });
+
+        if (projects.length !== projectIds.length) {
+          throw new NotFoundException('Some projects not found');
+        }
+
+        client.projects = projects;
+      }
     }
 
     return this.clientRepository.save(client);

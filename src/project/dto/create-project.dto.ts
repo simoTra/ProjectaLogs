@@ -1,14 +1,15 @@
-import { IsNotEmpty, IsString, IsNumber } from 'class-validator';
+import { IsNotEmpty, IsString, IsNumber, IsOptional } from 'class-validator';
+import { Client } from 'src/client/entities/client.entity';
 
 export class CreateProjectDto {
   @IsNotEmpty()
   @IsString()
   name: string;
 
-  @IsNotEmpty()
-  @IsString()
+  @IsString()  
+  @IsOptional()
   description: string;
 
-  @IsNumber()
-  clientId: number;
+  @IsOptional()
+  client: Client;
 }

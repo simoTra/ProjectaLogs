@@ -22,22 +22,23 @@ export class ProjectController {
   create(@Body() createProjectDto: CreateProjectDto): Promise<Project> {
     return this.projectService.create(createProjectDto);
   }
-
+  
   @Get()
   findAll(): Promise<Project[]> {
     return this.projectService.findAll();
   }
-
+  
   @Get(':id')
   findOne(@Param('id', ParseIntPipe) id: number): Promise<Project> {
     return this.projectService.findOne(id);
   }
-
+  
   @Patch(':id')
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateProjectDto: UpdateProjectDto,
   ): Promise<Project> {
+    console.log(updateProjectDto)
     return this.projectService.update(+id, updateProjectDto);
   }
 

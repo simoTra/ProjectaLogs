@@ -9,6 +9,6 @@ export class Client {
   @Column()
   name: string;
 
-  @OneToMany(() => Project, (project) => project.client)
-  projects: Project[];
+  @OneToMany(() => Project, (project) => project.client, { cascade: true, nullable: true })
+  projects?: Project[];
 }
