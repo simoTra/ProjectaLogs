@@ -7,7 +7,7 @@ export class CreateJobDto {
   @IsOptional()
   @IsNumber()
   @IsPositive()
-  totalDuration?: number;
+  total_duration?: number;
 
   @IsOptional()
   @IsNumber()
@@ -16,7 +16,7 @@ export class CreateJobDto {
   
   @IsOptional()
   @IsString()
-  filamentType?: string;
+  filament_type?: string;
 
   @IsOptional()
   @IsNumber()

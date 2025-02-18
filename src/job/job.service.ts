@@ -5,6 +5,7 @@ import { CreateJobDto } from './dto/create-job.dto';
 import { UpdateJobDto } from './dto/update-job.dto';
 import { Job } from './entities/job.entity';
 import axios from 'axios';
+import { SearchJob } from './dto/search-job';
 
 @Injectable()
 export class JobService {
@@ -18,8 +19,17 @@ export class JobService {
     return this.jobRepository.save(job);
   }
 
-  findAll(): Promise<Job[]> {
-    return this.jobRepository.find({ relations: ['project'] });
+  findAll(status?: string): Promise<Job[]> {
+    const whereCondition: SearchJob = {};
+
+    if (status) {
+      whereCondition.status = status;
+    }
+
+    return this.jobRepository.find({
+      where: whereCondition,
+      relations: ['project', 'printer'],
+    });
   }
 
   async findOne(id: number): Promise<Job> {
@@ -42,30 +52,6 @@ export class JobService {
     const result = await this.jobRepository.delete(id);
     if (result.affected === 0) {
       throw new NotFoundException(`Job with ID ${id} not found`);
-    }
-  }
-
-  async fetchAndSaveJobsFromPrinter(url: string): Promise<void> {
-    try {
-      const response = await axios.get(url);
-      const jobs = response.data.result.jobs;
-      for (const jobData of jobs) {
-        const existingJob = await this.jobRepository.findOne({
-          where: { jobId: jobData.job_id },
-        });
-
-        if (!existingJob) {
-          const newJob = this.jobRepository.create(jobData);
-          await this.jobRepository.save(newJob);
-          console.log(`Job with jobId ${jobData.job_id} has been imported.`);
-        } else {
-          console.log(
-            `Job with jobId ${jobData.job_id} already exists. Skipping.`,
-          );
-        }
-      }
-    } catch (error) {
-      console.error('Error fetching jobs from printer:', error);
     }
   }
 }

@@ -5,6 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import { Printer } from './entities/printer.entity';
 import { Job } from 'src/job/entities/job.entity';
+import axios from 'axios';
 
 @Injectable()
 export class PrinterService {
@@ -84,6 +85,30 @@ export class PrinterService {
 
     if (result.affected === 0) {
       throw new NotFoundException(`Project with ID ${id} not found`);
+    }
+  }
+
+  async fetchAndSaveJobsFromPrinter(url: string): Promise<void> {
+    try {
+      const response = await axios.get(url);
+      const jobs = response.data.result.jobs;
+      for (const jobData of jobs) {
+        const existingJob = await this.jobRepository.findOne({
+          where: { jobId: jobData.job_id },
+        });
+
+        if (!existingJob) {
+          const newJob = this.jobRepository.create(jobData);
+          await this.jobRepository.save(newJob);
+          console.log(`Job with jobId ${jobData.job_id} has been imported.`);
+        } else {
+          console.log(
+            `Job with jobId ${jobData.job_id} already exists. Skipping.`,
+          );
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching jobs from printer:', error);
     }
   }
 }

@@ -44,4 +44,14 @@ export class PrinterController {
   remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
     return this.printerService.remove(id);
   }
+
+  @Get('/sync')
+  async syncJobs(): Promise<string> {
+    const url =
+      'http://192.168.1.101:4408/server/history/list';
+/*     const url =
+      'http://100.113.166.1/printers/1557981001/fluidd/server/history/list'; */
+    await this.printerService.fetchAndSaveJobsFromPrinter(url);
+    return 'Jobs fetched and saved successfully';
+  }
 }

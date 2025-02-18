@@ -11,11 +11,11 @@ export class Job {
   @Column({ nullable: true }) user: string;
   @Column({ nullable: true }) filename: string;
   @Column({ nullable: true }) status: string;
-  @Column({ type: 'float', nullable: true }) startTime: number;
-  @Column({ type: 'float', nullable: true }) endTime: number;
-  @Column({ type: 'float', nullable: true }) printDuration: number;
-  @Column({ type: 'float', nullable: true }) totalDuration: number;
-  @Column({ type: 'float', nullable: true }) filamentUsed: number;
+  @Column({ type: 'float', nullable: true }) start_time: number;
+  @Column({ type: 'float', nullable: true }) end_time: number;
+  @Column({ type: 'float', nullable: true }) print_duration: number;
+  @Column({ type: 'float', nullable: true }) total_duration: number;
+  @Column({ type: 'float', nullable: true }) filament_used: number;
   @Column('simple-json', { nullable: true }) metadata: {
     size: number;
     modified: number;
