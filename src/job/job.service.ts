@@ -6,6 +6,7 @@ import { UpdateJobDto } from './dto/update-job.dto';
 import { Job } from './entities/job.entity';
 import axios from 'axios';
 import { SearchJob } from './dto/search-job';
+import { endOfMonth, startOfMonth, subMonths } from 'date-fns';
 
 @Injectable()
 export class JobService {
@@ -53,5 +54,18 @@ export class JobService {
     if (result.affected === 0) {
       throw new NotFoundException(`Job with ID ${id} not found`);
     }
+  }
+
+  async getJobsPerMonth(): Promise<{ month: string; jobCount: number }[]> {
+    const rawData = await this.jobRepository.query(`
+      SELECT 
+        strftime('%Y-%m', datetime(CAST(start_time AS INTEGER), 'unixepoch')) AS month,
+        COUNT(id) AS jobCount
+      FROM job
+      WHERE start_time IS NOT NULL
+      GROUP BY month
+      ORDER BY month ASC;
+    `);
+    return rawData;
   }
 }

@@ -17,7 +17,7 @@ export class ClientService {
 
   async create(createClientDto: CreateClientDto): Promise<Client> {
     const { ...clientData } = createClientDto;
-    
+
     if (createClientDto.projects) {
       if (Object.keys(createClientDto.projects).length === 0) {
         clientData.projects = null;
@@ -85,5 +85,17 @@ export class ClientService {
     if (result.affected === 0) {
       throw new NotFoundException(`Project with ID ${id} not found`);
     }
+  }
+
+  async getTopClients(): Promise<{ name: string; projects: number }[]> {
+    return this.clientRepository
+      .createQueryBuilder('client')
+      .leftJoinAndSelect('client.projects', 'project')
+      .select('client.name', 'name')
+      .addSelect('COUNT(project.id)', 'projects')
+      .groupBy('client.id')
+      .orderBy('projects', 'DESC')
+      .limit(3)
+      .getRawMany();
   }
 }

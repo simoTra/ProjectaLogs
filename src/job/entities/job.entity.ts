@@ -7,7 +7,7 @@ export class Job {
   id: number;
 
   @Column({ nullable: true })
-  jobId: string;
+  job_id: string;
   @Column({ nullable: true }) user: string;
   @Column({ nullable: true }) filename: string;
   @Column({ nullable: true }) status: string;
@@ -21,22 +21,22 @@ export class Job {
     modified: number;
     uuid: string;
     slicer: string;
-    slicerVersion: string;
-    gcodeStartByte: number;
-    gcodeEndByte: number;
-    layerCount: number;
-    objectHeight: number;
-    estimatedTime: number;
-    nozzleDiameter: number;
-    layerHeight: number;
-    firstLayerHeight: number;
-    firstLayerExtrTemp: number;
-    firstLayerBedTemp: number;
-    chamberTemp: number;
-    filamentName: string;
-    filamentType: string;
-    filamentTotal: number;
-    filamentWeightTotal: number;
+    slicer_version: string;
+    gcode_start_byte: number;
+    gcode_end_byte: number;
+    layer_count: number;
+    object_height: number;
+    estimated_time: number;
+    nozzle_diameter: number;
+    layer_height: number;
+    first_layer_height: number;
+    first_layer_extr_temp: number;
+    first_layer_bed_temp: number;
+    chamber_temp: number;
+    filament_name: string;
+    filament_type: string;
+    filament_total: number;
+    filament_weight_total: number;
     thumbnails: {
       width: number;
       height: number;

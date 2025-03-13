@@ -17,6 +17,11 @@ import { Client } from './entities/client.entity';
 export class ClientController {
   constructor(private readonly clientService: ClientService) {}
 
+  @Get('stats/top')
+  getTopClients() {
+    return this.clientService.getTopClients();
+  }
+
   @Post()
   create(@Body() createClientDto: CreateClientDto): Promise<Client> {
     return this.clientService.create(createClientDto);

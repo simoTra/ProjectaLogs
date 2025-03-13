@@ -17,6 +17,11 @@ import { Job } from './entities/job.entity';
 export class JobController {
   constructor(private readonly jobService: JobService) {}
 
+  @Get('stats/job-per-month')
+  getProjectsPerMonth() {
+    return this.jobService.getJobsPerMonth();
+  }
+
   @Post()
   create(@Body() jobData: CreateJobDto): Promise<Job> {
     return this.jobService.create(jobData);

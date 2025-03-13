@@ -95,4 +95,16 @@ export class ProjectService {
       throw new NotFoundException(`Project with ID ${id} not found`);
     }
   }
+
+  async getTopProjects(): Promise<{ name: string; jobs: number }[]> {
+    return this.projectRepository
+      .createQueryBuilder('project')
+      .leftJoinAndSelect('project.jobs', 'job')
+      .select('project.name', 'name')
+      .addSelect('COUNT(job.id)', 'jobs')
+      .groupBy('project.id')
+      .orderBy('jobs', 'DESC')
+      .limit(5)
+      .getRawMany();
+  }
 }

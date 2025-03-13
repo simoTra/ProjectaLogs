@@ -17,6 +17,21 @@ import { Printer } from './entities/printer.entity';
 export class PrinterController {
   constructor(private readonly printerService: PrinterService) {}
 
+  @Get('/syncJobs/:id')
+  async syncJobs(@Param('id', ParseIntPipe) id: number): Promise<string> {
+    const url =
+      'http://192.168.1.101:4408/server/history/list';
+    await this.printerService.fetchAndSaveJobsFromPrinter(id);
+    return 'Jobs fetched and saved successfully';
+  }
+  @Get('/syncStats/:id')
+  async syncStats(@Param('id', ParseIntPipe) id: number): Promise<string> {
+    const url =
+      'http://192.168.1.101:4408/server/history/totals';
+    await this.printerService.syncStats(id);
+    return 'Stats fetched and saved successfully';
+  }
+
   @Post()
   create(@Body() createPrinterDto: CreatePrinterDto): Promise<Printer> {
     return this.printerService.create(createPrinterDto);
@@ -43,15 +58,5 @@ export class PrinterController {
   @Delete(':id')
   remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
     return this.printerService.remove(id);
-  }
-
-  @Get('/sync')
-  async syncJobs(): Promise<string> {
-    const url =
-      'http://192.168.1.101:4408/server/history/list';
-/*     const url =
-      'http://100.113.166.1/printers/1557981001/fluidd/server/history/list'; */
-    await this.printerService.fetchAndSaveJobsFromPrinter(url);
-    return 'Jobs fetched and saved successfully';
   }
 }
