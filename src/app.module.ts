@@ -12,9 +12,12 @@ import { JobModule } from './job/job.module';
 import { Job } from './job/entities/job.entity';
 import { PrinterModule } from './printer/printer.module';
 import { Printer } from './printer/entities/printer.entity';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
   imports: [
+    ServeStaticModule.forRoot({ rootPath: join(__dirname, '..', 'public') }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
