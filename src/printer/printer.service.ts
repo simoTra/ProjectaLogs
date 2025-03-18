@@ -104,13 +104,12 @@ export class PrinterService {
           params: { limit: printer.job_totals.total_jobs + 100 },
         },
       );
-      const { count, jobs } = response.data.result;
+      const { jobs } = response.data.result;
 
       for (const jobData of jobs) {
         const existingJob = await this.jobRepository.findOne({
-          where: { job_id: jobData.job_id },
+          where: { job_id: jobData.job_id, printer: { id: id } },
         });
-        
         if (!existingJob) {
           jobData.printer = printer;
           const newJob = this.jobRepository.create(jobData);
@@ -131,27 +130,23 @@ export class PrinterService {
     const printer = await this.printerRepository.findOne({
       where: { id: id },
     });
-  
+
     if (!printer) {
       console.error(`Printer with ID ${id} not found.`);
       return;
     }
-  
+
     try {
       const response = await axios.get(
-        `${printer.ipAddress}/server/history/totals`
+        `${printer.ipAddress}/server/history/totals`,
       );
-  
+
       const { job_totals } = response.data.result;
-  
-      // Aggiorna i dati
+
       printer.job_totals = job_totals;
-  
-      // Salva nel database
       await this.printerRepository.save(printer);
     } catch (error) {
       console.error('Error fetching stats from printer:', error);
     }
   }
-  
 }
