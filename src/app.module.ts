@@ -23,8 +23,8 @@ import { join } from 'path';
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
         type: 'sqlite',
-        database: 'projectalogs-db.sqlite',
-        entities: [Project, Client, Job, Printer],
+        database: "/home/app/data/projectalogs-db.sqlite",
+        entities: [__dirname + '/**/*.entity{.ts,.js}'],
         synchronize: true,
       }),
     }),
