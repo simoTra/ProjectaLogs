@@ -52,7 +52,7 @@ import { JobList } from "./pages/job";
 import { Dashboard } from "./pages/dashboard";
 
 function App() {
-  const API_URL = "http://localhost:3000/api";
+  const API_URL = "/api";
 
   return (
     <BrowserRouter>

@@ -21,9 +21,9 @@ import { join } from 'path';
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
+      useFactory: () => ({
         type: 'sqlite',
-        database: "/home/app/data/projectalogs-db.sqlite",
+        database: "./data/projectalogs-db.sqlite",
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
         synchronize: true,
       }),
