@@ -48,13 +48,14 @@ import {
   PrinterList,
   PrinterShow,
 } from "./pages/printer";
-import { JobList } from "./pages/job";
+import { JobEdit, JobList, JobShow } from "./pages/job";
 import { Dashboard } from "./pages/dashboard";
 
 function App() {
-  const API_URL = "/api";
+  const API_URL = import.meta.env.VITE_API_URL;
 
   return (
+    console.log(import.meta.env.VITE_API_URL),
     <BrowserRouter>
       <RefineKbarProvider>
         <ColorModeContextProvider>
@@ -89,7 +90,6 @@ function App() {
                   {
                     name: "job",
                     list: "/job",
-                    create: "/job/create",
                     edit: "/job/edit/:id",
                     show: "/job/show/:id",
                     meta: {
@@ -194,11 +194,11 @@ function App() {
                       <Route path="/job/create" element={<AntdInferencer />} />
                       <Route
                         path="/job/edit/:id"
-                        element={<AntdInferencer />}
+                        element={<JobEdit />}
                       />
                       <Route
                         path="/job/show/:id"
-                        element={<AntdInferencer />}
+                        element={<JobShow />}
                       />
                     </Route>
                     <Route path="/client">

@@ -19,15 +19,11 @@ export class PrinterController {
 
   @Get('/syncJobs/:id')
   async syncJobs(@Param('id', ParseIntPipe) id: number): Promise<string> {
-    const url =
-      'http://192.168.1.101:4408/server/history/list';
     await this.printerService.fetchAndSaveJobsFromPrinter(id);
     return 'Jobs fetched and saved successfully';
   }
   @Get('/syncStats/:id')
   async syncStats(@Param('id', ParseIntPipe) id: number): Promise<string> {
-    const url =
-      'http://192.168.1.101:4408/server/history/totals';
     await this.printerService.syncStats(id);
     return 'Stats fetched and saved successfully';
   }
