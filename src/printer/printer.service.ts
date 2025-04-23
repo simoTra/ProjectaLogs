@@ -99,7 +99,6 @@ export class PrinterService {
     });
     try {
       const response = await axios.get(
-        //"http://100.113.166.1/printers/1557981001/fluidd/server/history/totals",
         `${printer.ipAddress}/server/history/list`,
         {
           params: { limit: printer.job_totals.total_jobs + 100 },
@@ -139,12 +138,10 @@ export class PrinterService {
 
     try {
       const response = await axios.get(
-        "http://100.113.166.1/printers/1557981001/fluidd/server/history/totals",
-       // `${printer.ipAddress}/server/history/totals`,
+       `${printer.ipAddress}/server/history/totals`,
       );
 
       const { job_totals } = response.data.result;
-
       printer.job_totals = job_totals;
       await this.printerRepository.save(printer);
     } catch (error) {
