@@ -114,7 +114,6 @@ export class PrinterService {
           jobData.printer = printer;
           const newJob = this.jobRepository.create(jobData);
           await this.jobRepository.save(newJob);
-          console.log(`Job with jobId ${jobData.job_id} has been imported.`);
         } else {
           console.log(
             `Job with jobId ${jobData.job_id} already exists. Skipping.`,
