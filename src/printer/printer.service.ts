@@ -83,6 +83,28 @@ export class PrinterService {
     return this.printerRepository.save(printer);
   }
 
+  async updatePrinterJobs(printerId: number, jobIds: number[]): Promise<Printer> {
+    const printer = await this.printerRepository.findOne({
+      where: { id: printerId },
+      relations: ['jobs'],
+    });
+
+    if (!printer) {
+      throw new NotFoundException(`Printer with ID ${printerId} not found`);
+    }
+
+    const jobs = await this.jobRepository.findBy({ id: In(jobIds) });
+
+    if (jobs.length !== jobIds.length) {
+      throw new NotFoundException('Some jobs not found');
+    }
+
+    printer.jobs = jobs;
+
+    return this.printerRepository.save(printer);
+  }
+
+
   async remove(id: number): Promise<void> {
     const result = await this.printerRepository.delete(id);
 
@@ -94,36 +116,41 @@ export class PrinterService {
   async fetchAndSaveJobsFromPrinter(id: number): Promise<void> {
     await this.syncStats(id);
     const printer = await this.printerRepository.findOne({
-      where: { id: id },
+      where: { id },
       relations: ['jobs'],
     });
+
     try {
-      const response = await axios.get(
-        `${printer.ipAddress}/server/history/list`,
-        {
-          params: { limit: printer.job_totals.total_jobs + 100 },
-        },
-      );
+      const response = await axios.get(`${printer.ipAddress}/server/history/list`, {
+        params: { limit: printer.job_totals.total_jobs + 100 },
+      });
+
       const { jobs } = response.data.result;
 
       for (const jobData of jobs) {
         const existingJob = await this.jobRepository.findOne({
-          where: { job_id: jobData.job_id, printer: { id: id } },
+          where: { job_id: jobData.job_id, printer: { id } },
         });
+
         if (!existingJob) {
           jobData.printer = printer;
           const newJob = this.jobRepository.create(jobData);
           await this.jobRepository.save(newJob);
+        } else if (existingJob.status !== jobData.status) {
+          console.log(`Updating job ${jobData.job_id} status from ${existingJob.status} to ${jobData.status}`);
+          await this.jobRepository.update(existingJob.id, {
+            ...existingJob,
+            ...jobData,
+          });
         } else {
-          console.log(
-            `Job with jobId ${jobData.job_id} already exists. Skipping.`,
-          );
+          console.log(`Job with jobId ${jobData.job_id} already exists with same status. Skipping.`);
         }
       }
     } catch (error) {
       console.error('Error fetching jobs from printer:', error);
     }
   }
+
 
   async syncStats(id: number) {
     const printer = await this.printerRepository.findOne({
@@ -137,7 +164,7 @@ export class PrinterService {
 
     try {
       const response = await axios.get(
-       `${printer.ipAddress}/server/history/totals`,
+        `${printer.ipAddress}/server/history/totals`,
       );
 
       const { job_totals } = response.data.result;
