@@ -36,7 +36,7 @@ export class JobService {
   async findOne(id: number): Promise<Job> {
     const job = await this.jobRepository.findOne({
       where: { id },
-      relations: ['project'],
+      relations: ['project', 'printer'],
     });
     if (!job) {
       throw new NotFoundException(`Job with ID ${id} not found`);
@@ -67,5 +67,5 @@ export class JobService {
       ORDER BY month ASC;
     `);
     return rawData;
-  }
+  }  
 }
