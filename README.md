@@ -1,85 +1,197 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# ProjectaLogs
+*A Work in Progress platform for managing 3D printing projects*
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+[![Status](https://img.shields.io/badge/status-WIP-orange)]() [![Backend](https://img.shields.io/badge/backend-NestJS-E0234E)]() [![Frontend](https://img.shields.io/badge/frontend-React%20%2B%20Refine-61DAFB)]() [![Integration](https://img.shields.io/badge/integration-Moonraker-2ea44f)]()
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+>[!IMPORTANT]
+> This repository is under active development. The Moonraker component is **not yet usable** and, for now, must be installed **directly on the printer**.
 
-## Description
+---
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## 📖 Overview
 
-## Project setup
+**ProjectaLogs** is a full-stack platform that brings **project & client management** into your 3D printing workflow.
 
-```bash
-$ npm install
+| ![On Mac](images/onMac.png) | ![On Iphone](images/onIphone.png) | ![Projects](images/projects.png) |
+| :-------------------------: | :-------------------------------: | :-------------------------------: |
+
+- **Moonraker Component** (`projectalogs.py`)  
+  Associates print jobs with Projects/Clients and reports results back to the server.  
+  *Experimental: manual install on the printer required.*
+
+- **Backend (NestJS)**  
+  REST API for managing projects, clients, jobs and printers.  
+  Ships with SQLite by default (easier local setup).
+
+- **Frontend (React + Refine)**  
+  A web dashboard to create/browse Projects, attach Jobs, view history, and manage Printers.
+
+## 🧭 Table of Contents
+
+- [ProjectaLogs](#projectalogs)
+  - [📖 Overview](#-overview)
+  - [🧭 Table of Contents](#-table-of-contents)
+  - [🏗️ Architecture](#️-architecture)
+  - [🚀 Getting Started](#-getting-started)
+    - [Requirements](#requirements)
+    - [Quick Start (Docker Compose)](#quick-start-docker-compose)
+  - [🛠️ Development](#️-development)
+    - [Install dependencies](#install-dependencies)
+    - [Start Backend (NestJS, API on :3000)](#start-backend-nestjs-api-on-3000)
+    - [Start Frontend (React + Refine, dev on :5173)](#start-frontend-react--refine-dev-on-5173)
+    - [Tmux convenience script](#tmux-convenience-script)
+  - [🧩 Moonraker Component (Experimental)](#-moonraker-component-experimental)
+  - [🗺️ Roadmap](#️-roadmap)
+  - [🤝 Contributing](#-contributing)
+  - [📜 License](#-license)
+  - [🙌 Credits](#-credits)
+
+---
+
+## 🏗️ Architecture
+
+High-level flow:
+
 ```
 
-## Compile and run the project
-
-```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+    Printer (Fluidd interface) → Moonraker → (projectalogs.py) → ProjectaLogs Backend (NestJS) → SQLite
+                                                                      ↓
+                                                                 ProjectaLogs Frontend (React + Refine)
 ```
 
-## Run tests
+Key URLs (defaults):
 
-```bash
-# unit tests
-$ npm run test
+- Backend API: http://localhost:3000/api
+- Frontend (dev): http://localhost:5173  
+- Frontend (prod build served by backend or container): http://localhost:3000
 
-# e2e tests
-$ npm run test:e2e
+---
 
-# test coverage
-$ npm run test:cov
+## 🚀 Getting Started
+
+### Requirements
+
+- Docker (recommended for first run)
+- Node.js (for local development)
+- A Klipper + Moonraker setup (only if you want to test the component)
+
+### Quick Start (Docker Compose)
+
+1. Create a directory:
+```
+    mkdir projectalogs
+    cd projectalogs
+    mkdir compose
+    cd compose
 ```
 
-## Resources
+2. Create a `docker-compose.yml` file in /projectalogs/compose:
+```
+    nano docker-compose.yml
+```
 
-Check out a few resources that may come in handy when working with NestJS:
+```
+  services:
+    projectalogs:
+      image: docker.io/simotra/projectalogs:latest
+      restart: unless-stopped
+      volumes:
+        - "./data:/app/data"
+      ports:
+        - "4499:3000"
+```
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
 
-## Support
+3. Start the service:
+```
+    docker-compose up -d
+```
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+4. Open the frontend in your browser:
 
-## Stay in touch
+    http://localhost:4499
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+> Notes:
+> - Data is persisted in the `./data` folder.
+> - In this setup, the frontend is served by the backend container on port `4499`.
+> - To stop the service, run `docker-compose down`.
 
-## License
+---
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+## 🛠️ Development
+
+### Install dependencies
+
+    npm install
+    cd dashboard
+    npm install
+    cd ..
+
+### Start Backend (NestJS, API on :3000)
+
+    npm run start:dev
+
+API base path:
+
+    http://localhost:3000/api
+
+### Start Frontend (React + Refine, dev on :5173)
+
+    cd dashboard
+    npm run dev
+
+Frontend dev URL:
+
+    http://localhost:5173
+
+### Tmux convenience script
+
+    ./start_all.sh
+>[!NOTE]
+> Optional helper to spin up services (adjust as needed).
+
+---
+
+## 🧩 Moonraker Component (Experimental)
+
+Status: **NOT READY FOR PRODUCTION**. API and behavior may change.
+
+- File: `projectalogs.py`
+- Temporary install: copy to your Moonraker components directory on the printer.
+- Config: merge the snippet from `moonraker.conf.example` into your Moonraker configuration.
+
+Expected behavior (target):
+
+- Attach the current print job to a selected Project/Client.
+- On job end (success/failure), POST a summary to the ProjectaLogs backend.
+- Allow project selection from Fluidd/Mainsail (via a small dialog).
+
+
+---
+
+## 🗺️ Roadmap
+
+- [ ] Finalize Moonraker hooks (start/end job, error handling).
+- [ ] Frontend polish (search, filters, analytics).
+- [ ] Export/Import data.
+- [ ] CI/CD and container hardening.
+
+---
+
+## 🤝 Contributing
+
+- Fork the repo and create a feature branch.
+- Add/adjust tests where relevant.
+- Submit a clear, focused PR describing your changes.
+
+---
+
+## 📜 License
+
+This project is licensed under the [MIT License](LICENSE).
+
+---
+
+## 🙌 Credits
+
+Inspired by [Spoolman](https://github.com/xynerator/spoolman) and the idea of integrating project tracking into Moonraker-driven workflows and dashboards (Fluidd/Mainsail), with a modern stack (NestJS + React/Refine).

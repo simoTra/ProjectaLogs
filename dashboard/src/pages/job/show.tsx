@@ -17,7 +17,7 @@ export const JobShow = () => {
 
 
   const record = data?.data;
-  const thumbnail = record?.metadata?.thumbnails?.find(t => t.width === 100 && t.height === 100);
+  const thumbnail = record?.metadata?.thumbnails?.find(t => t.width === 320 && t.height === 320);
   console.log('thumbnail', thumbnail);
 
   return (
@@ -51,15 +51,16 @@ export const JobShow = () => {
       <Title level={5}>Project</Title>
       <TextField value={record?.project?.name} />
 
+      <Title level={5}>Thumbnail</Title>
       {thumbnail && record?.id && (
-        <>
-          <Title level={5}>Thumbnail</Title>
+        <div>
           <img
             src={`${API_URL}/job/thumbnail/${record.id}?path=${encodeURIComponent(thumbnail.relative_path)}`}
             alt="Job thumbnail"
-            style={{ width: 100, height: 100, borderRadius: 4 }}
+            style={{ width: 320, height: 320, borderRadius: 4 }}
+            title="Thumbnail"
           />
-        </>
+        </div>
       )}
     </Show>
   );
