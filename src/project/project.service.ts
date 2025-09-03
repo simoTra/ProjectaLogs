@@ -6,9 +6,11 @@ import { UpdateProjectDto } from './dto/update-project.dto';
 import { Project } from './entities/project.entity';
 import { Client } from 'src/client/entities/client.entity';
 import { Job } from 'src/job/entities/job.entity';
+import { ProjectForPrinter } from './dto/project-for-printer';
 
 @Injectable()
 export class ProjectService {
+
   constructor(
     @InjectRepository(Project)
     private readonly projectRepository: Repository<Project>,
@@ -18,7 +20,7 @@ export class ProjectService {
 
     @InjectRepository(Client)
     private readonly clientRepository: Repository<Client>,
-  ) {}
+  ) { }
 
   async create(createProjectDto: CreateProjectDto): Promise<Project> {
     const { ...projectData } = createProjectDto;
@@ -106,5 +108,22 @@ export class ProjectService {
       .orderBy('jobs', 'DESC')
       .limit(5)
       .getRawMany();
+  }
+
+  async getProjectsForPrinter(): Promise<ProjectForPrinter[]> {
+    var projects = await this.projectRepository.find({ relations: ['jobs', 'client'] });
+    var projectsForPrinter = projects.map((project, idx) => {
+      console.log(idx);
+      console.log(project);
+      return {
+        id: project.id,
+        name: project.name,
+        description: project.description,
+        clientName: project.client.name,
+        jobsCount: project.jobs.length,
+      }
+    });
+    return projectsForPrinter;
+
   }
 }

@@ -51,6 +51,14 @@ export class PrinterController {
     return this.printerService.update(+id, updatePrinterDto);
   }
 
+  @Patch(':id/jobs')
+  async updatePrinterJobs(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() jobIds: number[],
+  ) {
+    return this.printerService.updatePrinterJobs(id, jobIds);
+  }
+
   @Delete(':id')
   remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
     return this.printerService.remove(id);

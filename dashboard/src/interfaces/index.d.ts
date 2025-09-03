@@ -36,6 +36,11 @@ export interface IJob {
     filament_type?: string;
     filament_total?: number;
     filament_weight_total?: number;
+    thumbnails?: {
+      width: number;
+      height: number;
+      relative_path: string;
+    }[];
   };
   auxiliary_data?: {
     provider?: string;

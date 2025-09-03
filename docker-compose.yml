@@ -1,0 +1,8 @@
+services:
+  projectalogs:
+    image: docker.io/simotra/projectalogs:latest
+    restart: unless-stopped
+    volumes:
+      - "./data:/app/data"
+    ports:
+      - "4499:3000"
