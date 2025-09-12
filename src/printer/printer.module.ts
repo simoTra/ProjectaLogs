@@ -9,6 +9,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
   imports: [TypeOrmModule.forFeature([Printer, Job])],
   controllers: [PrinterController],
   providers: [PrinterService],
-  exports: [TypeOrmModule],
+  exports: [TypeOrmModule, PrinterService],
 })
 export class PrinterModule {}

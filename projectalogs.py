@@ -20,6 +20,7 @@ class ProjectaLogs:
         self.printer_id = config.get("printer_id", "default_printer")
 
         self.current_project_id: Optional[str] = None
+        self.current_job_id: Optional[int] = None
         self.projects_cache: List[Dict[str, Any]] = []
         self.cache_time: float = 0
         self.cache_duration: int = 300
@@ -45,13 +46,16 @@ class ProjectaLogs:
 
     def _register_event_handlers(self):
         self.server.register_event_handler(
-            "job_queue:job_complete", lambda e: self._report_job(e, "completed")
+            "job_queue:job_started", self._create_job
         )
         self.server.register_event_handler(
-            "job_queue:job_cancelled", lambda e: self._report_job(e, "cancelled")
+            "job_queue:job_complete", lambda e: self._update_job(e, "completed")
         )
         self.server.register_event_handler(
-            "job_queue:job_error", lambda e: self._report_job(e, "error")
+            "job_queue:job_cancelled", lambda e: self._update_job(e, "cancelled")
+        )
+        self.server.register_event_handler(
+            "job_queue:job_error", lambda e: self._update_job(e, "error")
         )
         self.server.register_event_handler(
             "server:klippy_ready", self._handle_klippy_ready
@@ -126,25 +130,21 @@ class ProjectaLogs:
         
         self.cache_time = self.eventloop.get_loop_time()
 
-    async def _report_job(self, job_data: Dict[str, Any], status: str):
+    async def _create_job(self, job_data: Dict[str, Any]):
         try:
             payload = {
                 "printer_id": self.printer_id,
-                "project_id": self.current_project_id,
-                "status": status,
+                "projectId": self.current_project_id,
                 "job_id": job_data.get("job_id"),
                 "filename": job_data.get("filename"),
+                "status": "in_progress",
                 "start_time": job_data.get("start_time"),
-                "end_time": job_data.get("end_time"),
-                "print_duration": job_data.get("print_duration"),
-                "filament_used": job_data.get("filament_used"),
-                "metadata": job_data.get("metadata", {}),
-                "total_duration": job_data.get("total_duration")
+                "metadata": job_data.get("metadata", {})
             }
             
-            logging.info(f"ProjectaLogs: Sending job payload: {payload}")
+            logging.info(f"ProjectaLogs: Creating job with payload: {payload}")
             self.server.send_event("projectalogs:debug", {
-                "type": "job_payload",
+                "type": "create_job_payload",
                 "data": payload
             })
             
@@ -152,24 +152,73 @@ class ProjectaLogs:
             response.raise_for_status()
             response_data = response.json() if response.body else {}
             
-            logging.info(f"ProjectaLogs: Job report response: {response_data}")
+            # Store the created job ID for later updates
+            self.current_job_id = response_data.get("id")
+            
+            logging.info(f"ProjectaLogs: Created job {self.current_job_id}: {response_data}")
             self.server.send_event("projectalogs:debug", {
-                "type": "job_response", 
+                "type": "create_job_response", 
                 "data": response_data
             })
             
-            logging.info(f"ProjectaLogs: Sent {status} job report for {payload['filename']}")
         except HTTPError as e:
-            logging.error(f"ProjectaLogs: HTTP error reporting job: {e}")
+            logging.error(f"ProjectaLogs: HTTP error creating job: {e}")
             self.server.send_event("projectalogs:debug", {
                 "type": "error",
-                "data": {"error": str(e), "type": "http_error"}
+                "data": {"error": str(e), "type": "create_job_http_error"}
             })
         except Exception as e:
-            logging.error(f"ProjectaLogs: Failed to report job: {e}")
+            logging.error(f"ProjectaLogs: Failed to create job: {e}")
             self.server.send_event("projectalogs:debug", {
                 "type": "error", 
-                "data": {"error": str(e), "type": "general_error"}
+                "data": {"error": str(e), "type": "create_job_general_error"}
+            })
+
+    async def _update_job(self, job_data: Dict[str, Any], status: str):
+        if not self.current_job_id:
+            logging.error("ProjectaLogs: No current job ID to update")
+            return
+            
+        try:
+            payload = {
+                "status": status,
+                "end_time": job_data.get("end_time"),
+                "print_duration": job_data.get("print_duration"),
+                "total_duration": job_data.get("total_duration"),
+                "filament_used": job_data.get("filament_used")
+            }
+            
+            logging.info(f"ProjectaLogs: Updating job {self.current_job_id} with payload: {payload}")
+            self.server.send_event("projectalogs:debug", {
+                "type": "update_job_payload",
+                "data": payload
+            })
+            
+            update_url = f"{self.jobs_endpoint}/{self.current_job_id}"
+            response = await self.http_client.patch(update_url, json=payload)
+            response.raise_for_status()
+            response_data = response.json() if response.body else {}
+            
+            logging.info(f"ProjectaLogs: Updated job {self.current_job_id} with status {status}: {response_data}")
+            self.server.send_event("projectalogs:debug", {
+                "type": "update_job_response", 
+                "data": response_data
+            })
+            
+            # Clear the job ID after completion
+            self.current_job_id = None
+            
+        except HTTPError as e:
+            logging.error(f"ProjectaLogs: HTTP error updating job: {e}")
+            self.server.send_event("projectalogs:debug", {
+                "type": "error",
+                "data": {"error": str(e), "type": "update_job_http_error"}
+            })
+        except Exception as e:
+            logging.error(f"ProjectaLogs: Failed to update job: {e}")
+            self.server.send_event("projectalogs:debug", {
+                "type": "error", 
+                "data": {"error": str(e), "type": "update_job_general_error"}
             })
 
     async def close(self):

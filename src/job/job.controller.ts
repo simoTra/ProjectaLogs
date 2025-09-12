@@ -49,6 +49,26 @@ export class JobController {
     return this.jobService.getJobsPerMonth();
   }
 
+  @Get('stats/performance-analysis')
+  getJobPerformanceAnalysis() {
+    return this.jobService.getJobPerformanceAnalysis();
+  }
+
+  @Get('stats/success-rates')
+  getJobSuccessRates() {
+    return this.jobService.getJobSuccessRates();
+  }
+
+  @Get('stats/peak-usage')
+  getPeakUsageAnalysis() {
+    return this.jobService.getPeakUsageAnalysis();
+  }
+
+  @Get('stats/efficiency-metrics')
+  getEfficiencyMetrics() {
+    return this.jobService.getEfficiencyMetrics();
+  }
+
   @Post()
   create(@Body() jobData: CreateJobDto): Promise<Job> {
     return this.jobService.create(jobData);

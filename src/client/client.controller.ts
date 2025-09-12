@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   ParseIntPipe,
+  Query,
 } from '@nestjs/common';
 import { ClientService } from './client.service';
 import { CreateClientDto } from './dto/create-client.dto';
@@ -20,6 +21,27 @@ export class ClientController {
   @Get('stats/top')
   getTopClients() {
     return this.clientService.getTopClients();
+  }
+
+  @Get('stats/top-by-print-time')
+  getTopClientsByPrintTime() {
+    return this.clientService.getTopClientsByPrintTime();
+  }
+
+  @Get('stats/top-by-filament')
+  getTopClientsByFilament() {
+    return this.clientService.getTopClientsByFilament();
+  }
+
+  @Get('stats/most-active')
+  getMostActiveClients(@Query('days') days?: string) {
+    const numDays = days ? parseInt(days, 10) : 30;
+    return this.clientService.getMostActiveClients(numDays);
+  }
+
+  @Get('stats/success-rates')
+  getClientSuccessRates() {
+    return this.clientService.getClientSuccessRates();
   }
 
   @Post()

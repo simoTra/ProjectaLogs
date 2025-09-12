@@ -54,6 +54,10 @@ export class Job {
 
   @Column({ nullable: true })
   @ApiProperty({ type: 'string', required: false })
+  printer_id: string;
+
+  @Column({ nullable: true })
+  @ApiProperty({ type: 'string', required: false })
   user: string;
 
   @Column({ nullable: true })

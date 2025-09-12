@@ -29,6 +29,26 @@ export class ProjectController {
     return this.projectService.getTopProjects();
   }
 
+  @Get('stats/by-duration')
+  getProjectsByDuration() {
+    return this.projectService.getProjectsByDuration();
+  }
+
+  @Get('stats/by-print-time')
+  getProjectsByPrintTime() {
+    return this.projectService.getProjectsByPrintTime();
+  }
+
+  @Get('stats/most-complex')
+  getMostComplexProjects() {
+    return this.projectService.getMostComplexProjects();
+  }
+
+  @Get('stats/completion-trends')
+  getProjectCompletionTrends() {
+    return this.projectService.getProjectCompletionTrends();
+  }
+
   @Post()
   create(@Body() createProjectDto: CreateProjectDto): Promise<Project> {
     return this.projectService.create(createProjectDto);

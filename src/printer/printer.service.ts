@@ -174,4 +174,100 @@ export class PrinterService {
       console.error('Error fetching stats from printer:', error);
     }
   }
+
+  async getPrinterUtilizationRates(): Promise<{ 
+    printerName: string; 
+    totalJobs: number; 
+    totalPrintTime: number; 
+    avgJobsPerDay: number;
+    utilizationScore: number;
+  }[]> {
+    return this.printerRepository
+      .createQueryBuilder('printer')
+      .leftJoin('printer.jobs', 'job')
+      .select('printer.name', 'printerName')
+      .addSelect('COUNT(job.id)', 'totalJobs')
+      .addSelect('COALESCE(SUM(job.print_duration), 0)', 'totalPrintTime')
+      .addSelect('COALESCE(COUNT(job.id) / 30.0, 0)', 'avgJobsPerDay') // Assuming 30-day period
+      .addSelect('COALESCE(SUM(job.print_duration) / 86400.0, 0)', 'utilizationScore') // Hours per day equivalent
+      .groupBy('printer.id')
+      .orderBy('utilizationScore', 'DESC')
+      .getRawMany();
+  }
+
+  async getPrinterReliabilityComparison(): Promise<{ 
+    printerName: string; 
+    totalJobs: number; 
+    completedJobs: number; 
+    failedJobs: number;
+    successRate: number; 
+    avgJobDuration: number;
+  }[]> {
+    return this.printerRepository
+      .createQueryBuilder('printer')
+      .leftJoin('printer.jobs', 'job')
+      .select('printer.name', 'printerName')
+      .addSelect('COUNT(job.id)', 'totalJobs')
+      .addSelect('SUM(CASE WHEN job.status = "completed" THEN 1 ELSE 0 END)', 'completedJobs')
+      .addSelect('SUM(CASE WHEN job.status = "error" OR job.status = "cancelled" THEN 1 ELSE 0 END)', 'failedJobs')
+      .addSelect('ROUND(SUM(CASE WHEN job.status = "completed" THEN 1 ELSE 0 END) * 100.0 / COUNT(job.id), 2)', 'successRate')
+      .addSelect('AVG(job.print_duration)', 'avgJobDuration')
+      .where('job.status IS NOT NULL')
+      .groupBy('printer.id')
+      .having('COUNT(job.id) > 0')
+      .orderBy('successRate', 'DESC')
+      .getRawMany();
+  }
+
+  async getPrinterPerformanceMetrics(): Promise<{ 
+    printerName: string; 
+    avgJobTime: number; 
+    medianJobTime: number;
+    totalFilament: number;
+    avgFilamentPerJob: number;
+    jobCount: number;
+    longestJob: number;
+  }[]> {
+    return this.printerRepository
+      .createQueryBuilder('printer')
+      .leftJoin('printer.jobs', 'job')
+      .select('printer.name', 'printerName')
+      .addSelect('AVG(job.print_duration)', 'avgJobTime')
+      .addSelect('COUNT(job.id)', 'jobCount')
+      .addSelect('COALESCE(SUM(job.filament_used), 0)', 'totalFilament')
+      .addSelect('COALESCE(AVG(job.filament_used), 0)', 'avgFilamentPerJob')
+      .addSelect('MAX(job.print_duration)', 'longestJob')
+      .addSelect('0', 'medianJobTime') // Simplified - calculating median in SQL is complex
+      .where('job.print_duration > 0')
+      .groupBy('printer.id')
+      .having('COUNT(job.id) > 0')
+      .orderBy('avgJobTime', 'ASC')
+      .getRawMany();
+  }
+
+  async getPrinterWorkloadDistribution(): Promise<{ 
+    printerName: string; 
+    jobCount: number; 
+    percentage: number;
+    totalPrintTime: number;
+    timePercentage: number;
+  }[]> {
+    return this.printerRepository
+      .createQueryBuilder('printer')
+      .leftJoin('printer.jobs', 'job')
+      .select('printer.name', 'printerName')
+      .addSelect('COUNT(job.id)', 'jobCount')
+      .addSelect('COALESCE(SUM(job.print_duration), 0)', 'totalPrintTime')
+      .addSelect(
+        'ROUND(COUNT(job.id) * 100.0 / (SELECT COUNT(*) FROM job), 2)', 
+        'percentage'
+      )
+      .addSelect(
+        'ROUND(COALESCE(SUM(job.print_duration), 0) * 100.0 / (SELECT SUM(print_duration) FROM job WHERE print_duration > 0), 2)', 
+        'timePercentage'
+      )
+      .groupBy('printer.id')
+      .orderBy('jobCount', 'DESC')
+      .getRawMany();
+  }
 }

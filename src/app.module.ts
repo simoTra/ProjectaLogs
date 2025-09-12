@@ -34,7 +34,9 @@ import { join } from 'path';
     PrinterModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+  ],
 })
 export class AppModule {
   constructor(private dataSource: DataSource) {}

@@ -10,6 +10,6 @@ import { Job } from 'src/job/entities/job.entity';
   imports: [TypeOrmModule.forFeature([Project, Client, Job])],
   controllers: [ProjectController],
   providers: [ProjectService],
-  exports: [TypeOrmModule]
+  exports: [TypeOrmModule, ProjectService]
 })
 export class ProjectModule {}

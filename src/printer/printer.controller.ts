@@ -28,6 +28,26 @@ export class PrinterController {
     return 'Stats fetched and saved successfully';
   }
 
+  @Get('stats/utilization-rates')
+  getPrinterUtilizationRates() {
+    return this.printerService.getPrinterUtilizationRates();
+  }
+
+  @Get('stats/reliability-comparison')
+  getPrinterReliabilityComparison() {
+    return this.printerService.getPrinterReliabilityComparison();
+  }
+
+  @Get('stats/performance-metrics')
+  getPrinterPerformanceMetrics() {
+    return this.printerService.getPrinterPerformanceMetrics();
+  }
+
+  @Get('stats/workload-distribution')
+  getPrinterWorkloadDistribution() {
+    return this.printerService.getPrinterWorkloadDistribution();
+  }
+
   @Post()
   create(@Body() createPrinterDto: CreatePrinterDto): Promise<Printer> {
     return this.printerService.create(createPrinterDto);

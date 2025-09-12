@@ -55,7 +55,6 @@ function App() {
   const API_URL = import.meta.env.VITE_API_URL;
 
   return (
-    console.log(import.meta.env.VITE_API_URL),
     <BrowserRouter>
       <RefineKbarProvider>
         <ColorModeContextProvider>
@@ -162,18 +161,6 @@ function App() {
                     }
                   >
                     <Route index element={<Dashboard />} />
-                    <Route
-                      index
-                      element={<NavigateToResource resource="project" />}
-                    />
-                    <Route
-                      index
-                      element={<NavigateToResource resource="job" />}
-                    />
-                    <Route
-                      index
-                      element={<NavigateToResource resource="client" />}
-                    />
                     <Route path="/project">
                       <Route path="/project" element={<ProjectList />} />
                       <Route

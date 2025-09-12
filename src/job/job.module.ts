@@ -10,5 +10,6 @@ import { Printer } from 'src/printer/entities/printer.entity';
   imports: [TypeOrmModule.forFeature([Job, Project, Printer])],
   controllers: [JobController],
   providers: [JobService],
+  exports: [JobService],
 })
 export class JobModule {}

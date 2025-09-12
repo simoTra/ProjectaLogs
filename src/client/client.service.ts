@@ -98,4 +98,64 @@ export class ClientService {
       .limit(3)
       .getRawMany();
   }
+
+  async getTopClientsByPrintTime(): Promise<{ name: string; totalPrintTime: number }[]> {
+    return this.clientRepository
+      .createQueryBuilder('client')
+      .leftJoin('client.projects', 'project')
+      .leftJoin('project.jobs', 'job')
+      .select('client.name', 'name')
+      .addSelect('COALESCE(SUM(job.print_duration), 0)', 'totalPrintTime')
+      .groupBy('client.id')
+      .orderBy('totalPrintTime', 'DESC')
+      .limit(5)
+      .getRawMany();
+  }
+
+  async getTopClientsByFilament(): Promise<{ name: string; totalFilament: number }[]> {
+    return this.clientRepository
+      .createQueryBuilder('client')
+      .leftJoin('client.projects', 'project')
+      .leftJoin('project.jobs', 'job')
+      .select('client.name', 'name')
+      .addSelect('COALESCE(SUM(job.filament_used), 0)', 'totalFilament')
+      .groupBy('client.id')
+      .orderBy('totalFilament', 'DESC')
+      .limit(5)
+      .getRawMany();
+  }
+
+  async getMostActiveClients(days: number = 30): Promise<{ name: string; recentJobs: number }[]> {
+    const cutoffDate = Date.now() / 1000 - (days * 24 * 60 * 60); // Convert to Unix timestamp
+    
+    return this.clientRepository
+      .createQueryBuilder('client')
+      .leftJoin('client.projects', 'project')
+      .leftJoin('project.jobs', 'job')
+      .select('client.name', 'name')
+      .addSelect('COUNT(job.id)', 'recentJobs')
+      .where('job.start_time > :cutoffDate', { cutoffDate })
+      .groupBy('client.id')
+      .orderBy('recentJobs', 'DESC')
+      .limit(5)
+      .getRawMany();
+  }
+
+  async getClientSuccessRates(): Promise<{ name: string; successRate: number; totalJobs: number }[]> {
+    return this.clientRepository
+      .createQueryBuilder('client')
+      .leftJoin('client.projects', 'project')
+      .leftJoin('project.jobs', 'job')
+      .select('client.name', 'name')
+      .addSelect('COUNT(job.id)', 'totalJobs')
+      .addSelect(
+        'ROUND(COUNT(CASE WHEN job.status = "completed" THEN 1 END) * 100.0 / COUNT(job.id), 2)', 
+        'successRate'
+      )
+      .where('job.status IS NOT NULL')
+      .groupBy('client.id')
+      .having('COUNT(job.id) > 0')
+      .orderBy('successRate', 'DESC')
+      .getRawMany();
+  }
 }
