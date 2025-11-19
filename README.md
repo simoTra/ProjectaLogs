@@ -53,17 +53,10 @@
 High-level flow:
 
 ```
-
     Printer (Fluidd interface) → Moonraker → (projectalogs.py) → ProjectaLogs Backend (NestJS) → SQLite
                                                                       ↓
                                                                  ProjectaLogs Frontend (React + Refine)
 ```
-
-Key URLs (defaults):
-
-- Backend API: http://localhost:3000/api
-- Frontend (dev): http://localhost:5173  
-- Frontend (prod build served by backend or container): http://localhost:3000
 
 ---
 
@@ -165,7 +158,6 @@ Expected behavior (target):
 - Attach the current print job to a selected Project/Client.
 - On job end (success/failure), POST a summary to the ProjectaLogs backend.
 - Allow project selection from Fluidd/Mainsail (via a small dialog).
-
 
 ---
 

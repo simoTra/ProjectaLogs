@@ -37,66 +37,66 @@ export const Dashboard: React.FC = () => {
   const { data: systemOverview, isLoading: overviewLoading, error: overviewError } = useCustom<SystemOverview>({
     url: `${API_URL}/stats/overview`,
     method: "get",
-  });
+  }).query;
 
   // Client analytics data
   const { data: clientPrintTime, isLoading: clientPrintTimeLoading } = useCustom({
-    url: `${API_URL}/client/stats/top-by-print-time`,
+    url: `${API_URL}/clients/stats/top-by-print-time`,
     method: "get",
-  });
+  }).query;
 
   const { data: clientFilament, isLoading: clientFilamentLoading } = useCustom({
-    url: `${API_URL}/client/stats/top-by-filament`,
+    url: `${API_URL}/clients/stats/top-by-filament`,
     method: "get",
-  });
+  }).query;
 
   const { data: clientSuccessRates, isLoading: clientSuccessRatesLoading } = useCustom({
-    url: `${API_URL}/client/stats/success-rates`,
+    url: `${API_URL}/clients/stats/success-rates`,
     method: "get",
-  });
+  }).query;
 
   // Project analytics data
   const { data: projectDuration, isLoading: projectDurationLoading } = useCustom({
-    url: `${API_URL}/project/stats/by-duration`,
+    url: `${API_URL}/projects/stats/by-duration`,
     method: "get",
-  });
+  }).query;
 
   const { data: projectComplexity, isLoading: projectComplexityLoading } = useCustom({
-    url: `${API_URL}/project/stats/most-complex`,
+    url: `${API_URL}/projects/stats/most-complex`,
     method: "get",
-  });
+  }).query;
 
   // Job analytics data
   const { data: jobPerformance, isLoading: jobPerformanceLoading } = useCustom({
-    url: `${API_URL}/job/stats/performance-analysis`,
+    url: `${API_URL}/jobs/stats/performance-analysis`,
     method: "get",
-  });
+  }).query;
 
   const { data: jobSuccessRates, isLoading: jobSuccessRatesLoading } = useCustom({
-    url: `${API_URL}/job/stats/success-rates`,
+    url: `${API_URL}/jobs/stats/success-rates`,
     method: "get",
-  });
+  }).query;
 
   const { data: jobEfficiency, isLoading: jobEfficiencyLoading } = useCustom({
-    url: `${API_URL}/job/stats/efficiency-metrics`,
+    url: `${API_URL}/jobs/stats/efficiency-metrics`,
     method: "get",
-  });
+  }).query;
 
   // Printer analytics data
   const { data: printerUtilization, isLoading: printerUtilizationLoading } = useCustom({
-    url: `${API_URL}/printer/stats/utilization-rates`,
+    url: `${API_URL}/printers/stats/utilization-rates`,
     method: "get",
-  });
+  }).query;
 
   const { data: printerReliability, isLoading: printerReliabilityLoading } = useCustom({
-    url: `${API_URL}/printer/stats/reliability-comparison`,
+    url: `${API_URL}/printers/stats/reliability-comparison`,
     method: "get",
-  });
+  }).query;
 
   const { data: printerWorkload, isLoading: printerWorkloadLoading } = useCustom({
-    url: `${API_URL}/printer/stats/workload-distribution`,
+    url: `${API_URL}/printers/stats/workload-distribution`,
     method: "get",
-  });
+  }).query;
 
   const isLoading = overviewLoading || clientPrintTimeLoading || clientFilamentLoading || 
     clientSuccessRatesLoading || projectDurationLoading || projectComplexityLoading ||

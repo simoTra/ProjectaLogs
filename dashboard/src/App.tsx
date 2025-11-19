@@ -5,9 +5,9 @@ import { AntdInferencer } from "@refinedev/inferencer/antd";
 
 import {
   ErrorComponent,
-  ThemedLayoutV2,
-  ThemedSiderV2,
-  ThemedTitleV2,
+  ThemedLayout,
+  ThemedSider,
+  ThemedTitle,
   useNotificationProvider,
 } from "@refinedev/antd";
 import "@refinedev/antd/dist/reset.css";
@@ -122,18 +122,17 @@ function App() {
                 options={{
                   syncWithLocation: true,
                   warnWhenUnsavedChanges: true,
-                  useNewQueryKeys: true,
                   projectId: "SHzJAm-gbWyKh-kL7d5G",
                 }}
               >
                 <Routes>
                   <Route
                     element={
-                      <ThemedLayoutV2
+                      <ThemedLayout
                         Header={() => <Header sticky />}
-                        Sider={(props) => <ThemedSiderV2 {...props} fixed />}
-                        Title={({ collapsed }) => (
-                          <ThemedTitleV2
+                        Sider={(props: any) => <ThemedSider {...props} fixed />}
+                        Title={({ collapsed }: any) => (
+                          <ThemedTitle
                             collapsed={collapsed}
                             icon={
                               collapsed ? (
@@ -157,7 +156,7 @@ function App() {
                         )}
                       >
                         <Outlet />
-                      </ThemedLayoutV2>
+                      </ThemedLayout>
                     }
                   >
                     <Route index element={<Dashboard />} />

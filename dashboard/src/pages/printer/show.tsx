@@ -20,7 +20,7 @@ export const PrinterShow = () => {
         queryOptions: {
             enabled: false,
         },
-    });
+    }).query;
 
     const {  refetch: refetchStats, isFetching: isImportingStats } = useCustom({
         url: `${API_URL}/printers/syncStats/${record?.id}`,
@@ -28,7 +28,7 @@ export const PrinterShow = () => {
         queryOptions: {
             enabled: false,
         },
-    });
+    }).query;
 
     return (
         <Show isLoading={isLoading}>
