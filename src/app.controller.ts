@@ -1,9 +1,9 @@
 import { Controller, Get } from '@nestjs/common';
 import { AppService } from './app.service';
-import { ClientService } from './client/client.service';
-import { ProjectService } from './project/project.service';
-import { JobService } from './job/job.service';
-import { PrinterService } from './printer/printer.service';
+import { ClientService } from './clients/client.service';
+import { ProjectService } from './projects/project.service';
+import { JobService } from './jobs/job.service';
+import { PrinterService } from './printers/printer.service';
 
 @Controller()
 export class AppController {

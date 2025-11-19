@@ -1,17 +1,17 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { ProjectModule } from './project/project.module';
+import { ProjectModule } from './projects/project.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Project } from './project/entities/project.entity';
+import { Project } from './projects/entities/project.entity';
 import { DataSource } from 'typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { ClientModule } from './client/client.module';
-import { Client } from './client/entities/client.entity';
-import { JobModule } from './job/job.module';
-import { Job } from './job/entities/job.entity';
-import { PrinterModule } from './printer/printer.module';
-import { Printer } from './printer/entities/printer.entity';
+import { ClientModule } from './clients/client.module';
+import { Client } from './clients/entities/client.entity';
+import { JobModule } from './jobs/job.module';
+import { Job } from './jobs/entities/job.entity';
+import { PrinterModule } from './printers/printer.module';
+import { Printer } from './printers/entities/printer.entity';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 
