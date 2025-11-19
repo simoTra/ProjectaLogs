@@ -15,7 +15,7 @@ export const PrinterShow = () => {
     const record = data?.data;
 
     const { refetch: refetchJobs, isFetching: isImportingJobs } = useCustom({
-        url: `${API_URL}/printer/syncJobs/${record?.id}`,
+        url: `${API_URL}/printers/syncJobs/${record?.id}`,
         method: "get",
         queryOptions: {
             enabled: false,
@@ -23,7 +23,7 @@ export const PrinterShow = () => {
     });
 
     const {  refetch: refetchStats, isFetching: isImportingStats } = useCustom({
-        url: `${API_URL}/printer/syncStats/${record?.id}`,
+        url: `${API_URL}/printers/syncStats/${record?.id}`,
         method: "get",
         queryOptions: {
             enabled: false,

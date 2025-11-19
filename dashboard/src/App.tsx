@@ -76,43 +76,43 @@ function App() {
                     },
                   },
                   {
-                    name: "project",
-                    list: "/project",
-                    create: "/project/create",
-                    edit: "/project/edit/:id",
-                    show: "/project/show/:id",
+                    name: "projects",
+                    list: "/projects",
+                    create: "/projects/create",
+                    edit: "/projects/edit/:id",
+                    show: "/projects/show/:id",
                     meta: {
                       canDelete: true,
                       icon: <ProjectOutlined />,
                     },
                   },
                   {
-                    name: "job",
-                    list: "/job",
-                    edit: "/job/edit/:id",
-                    show: "/job/show/:id",
+                    name: "jobs",
+                    list: "/jobs",
+                    edit: "/jobs/edit/:id",
+                    show: "/jobs/show/:id",
                     meta: {
                       canDelete: true,
                       icon: <FolderOutlined />,
                     },
                   },
                   {
-                    name: "client",
-                    list: "/client",
-                    create: "/client/create",
-                    edit: "/client/edit/:id",
-                    show: "/client/show/:id",
+                    name: "clients",
+                    list: "/clients",
+                    create: "/clients/create",
+                    edit: "/clients/edit/:id",
+                    show: "/clients/show/:id",
                     meta: {
                       canDelete: true,
                       icon: <UserOutlined />,
                     },
                   },
                   {
-                    name: "printer",
-                    list: "/printer",
-                    create: "/printer/create",
-                    edit: "/printer/edit/:id",
-                    show: "/printer/show/:id",
+                    name: "printers",
+                    list: "/printers",
+                    create: "/printers/create",
+                    edit: "/printers/edit/:id",
+                    show: "/printers/show/:id",
                     meta: {
                       canDelete: true,
                       icon: <PrinterOutlined />,
@@ -161,51 +161,51 @@ function App() {
                     }
                   >
                     <Route index element={<Dashboard />} />
-                    <Route path="/project">
-                      <Route path="/project" element={<ProjectList />} />
+                    <Route path="/projects">
+                      <Route path="/projects" element={<ProjectList />} />
                       <Route
-                        path="/project/create"
+                        path="/projects/create"
                         element={<ProjectCreate />}
                       />
                       <Route
-                        path="/project/edit/:id"
+                        path="/projects/edit/:id"
                         element={<ProjectEdit />}
                       />
                       <Route
-                        path="/project/show/:id"
+                        path="/projects/show/:id"
                         element={<ProjectShow />}
                       />
                     </Route>
-                    <Route path="/job">
-                      <Route path="/job" element={<JobList />} />
-                      <Route path="/job/create" element={<AntdInferencer />} />
+                    <Route path="/jobs">
+                      <Route path="/jobs" element={<JobList />} />
+                      <Route path="/jobs/create" element={<AntdInferencer />} />
                       <Route
-                        path="/job/edit/:id"
+                        path="/jobs/edit/:id"
                         element={<JobEdit />}
                       />
                       <Route
-                        path="/job/show/:id"
+                        path="/jobs/show/:id"
                         element={<JobShow />}
                       />
                     </Route>
-                    <Route path="/client">
-                      <Route path="/client" element={<ClientList />} />
-                      <Route path="/client/create" element={<ClientCreate />} />
-                      <Route path="/client/edit/:id" element={<ClientEdit />} />
-                      <Route path="/client/show/:id" element={<ClientShow />} />
+                    <Route path="/clients">
+                      <Route path="/clients" element={<ClientList />} />
+                      <Route path="/clients/create" element={<ClientCreate />} />
+                      <Route path="/clients/edit/:id" element={<ClientEdit />} />
+                      <Route path="/clients/show/:id" element={<ClientShow />} />
                     </Route>
-                    <Route path="/printer">
-                      <Route path="/printer" element={<PrinterList />} />
+                    <Route path="/printers">
+                      <Route path="/printers" element={<PrinterList />} />
                       <Route
-                        path="/printer/create"
+                        path="/printers/create"
                         element={<PrinterCreate />}
                       />
                       <Route
-                        path="/printer/edit/:id"
+                        path="/printers/edit/:id"
                         element={<PrinterEdit />}
                       />
                       <Route
-                        path="/printer/show/:id"
+                        path="/printers/show/:id"
                         element={<PrinterShow />}
                       />
                     </Route>

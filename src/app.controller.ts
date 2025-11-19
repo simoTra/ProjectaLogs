@@ -1,18 +1,18 @@
 import { Controller, Get } from '@nestjs/common';
 import { AppService } from './app.service';
-import { ClientService } from './client/client.service';
-import { ProjectService } from './project/project.service';
-import { JobService } from './job/job.service';
-import { PrinterService } from './printer/printer.service';
+import { ClientsService } from './clients/clients.service';
+import { ProjectsService } from './projects/projects.service';
+import { JobsService } from './jobs/jobs.service';
+import { PrintersService } from './printers/printers.service';
 
 @Controller()
 export class AppController {
   constructor(
     private readonly appService: AppService,
-    private readonly clientService: ClientService,
-    private readonly projectService: ProjectService,
-    private readonly jobService: JobService,
-    private readonly printerService: PrinterService,
+    private readonly clientsService: ClientsService,
+    private readonly projectsService: ProjectsService,
+    private readonly jobsService: JobsService,
+    private readonly printersService: PrintersService,
   ) {}
 
   @Get()
@@ -29,10 +29,10 @@ export class AppController {
       printerUtilization,
       systemMetrics
     ] = await Promise.all([
-      this.clientService.getTopClients(),
-      this.projectService.getTopProjects(),
-      this.jobService.getJobsPerMonth(),
-      this.printerService.getPrinterUtilizationRates(),
+      this.clientsService.getTopClients(),
+      this.projectsService.getTopProjects(),
+      this.jobsService.getJobsPerMonth(),
+      this.printersService.getPrinterUtilizationRates(),
       this.getSystemMetrics()
     ]);
 
@@ -47,8 +47,8 @@ export class AppController {
   }
 
   private async getSystemMetrics() {
-    const successRates = await this.jobService.getJobSuccessRates();
-    const efficiencyMetrics = await this.jobService.getEfficiencyMetrics();
+    const successRates = await this.jobsService.getJobSuccessRates();
+    const efficiencyMetrics = await this.jobsService.getEfficiencyMetrics();
     
     return {
       totalSuccess: successRates.overall.successRate || 0,
