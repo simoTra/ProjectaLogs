@@ -9,7 +9,7 @@ export const JobEdit = () => {
   const jobData = query?.data?.data;
 
   const { selectProps: projectSelectProps } = useSelect<IProject>({
-    resource: 'project',
+    resource: 'projects',
     optionLabel: 'name',
   });
 

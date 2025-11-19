@@ -15,7 +15,7 @@ export const PrinterEdit = () => {
   const [jobs, setJobs] = React.useState<number[]>([]);
 
   const { selectProps: jobsSelectProps } = useSelect<IJob>({
-    resource: "job",
+    resource: "jobs",
     optionLabel: "filename",
     optionValue: "id",
   });
@@ -34,7 +34,7 @@ export const PrinterEdit = () => {
       });
 
       if (jobs.length) {
-        await axios.patch(`${apiUrl}/printer/${values.id}/jobs`, jobs);
+        await axios.patch(`${apiUrl}/printers/${values.id}/jobs`, jobs);
       }
     } catch (error: any) {
       notification.error({

@@ -117,42 +117,213 @@ export class PrintersService {
     }
   }
 
-  async fetchAndSaveJobsFromPrinter(id: number): Promise<void> {
-    await this.syncStats(id);
-    const printer = await this.printerRepository.findOne({
-      where: { id },
-      relations: ['jobs'],
-    });
+  async fetchAndSaveJobsFromPrinter(id: number): Promise<JobSyncResult> {
+    const result: JobSyncResult = {
+      success: false,
+      jobsAdded: 0,
+      jobsUpdated: 0,
+      jobsSkipped: 0,
+      jobsFailed: 0,
+      errors: [],
+      totalProcessed: 0,
+    };
 
     try {
-      const response = await axios.get(`${printer.ipAddress}/server/history/list`, {
-        params: { limit: printer.job_totals.total_jobs + 100 },
+      // Sync stats first to get accurate job totals
+      await this.syncStats(id);
+
+      // Fetch printer with validation
+      const printer = await this.printerRepository.findOne({
+        where: { id },
       });
 
-      const { jobs } = response.data.result;
+      if (!printer) {
+        throw new NotFoundException(`Printer with ID ${id} not found`);
+      }
 
-      for (const jobData of jobs) {
-        const existingJob = await this.jobRepository.findOne({
-          where: { job_id: jobData.job_id, printer: { id } },
+      // Safely determine the limit for API request
+      const limit = printer.job_totals?.total_jobs
+        ? printer.job_totals.total_jobs + 100
+        : 1000; // Default fallback if job_totals is not available
+
+      this.logger.log(`Fetching jobs from printer ${printer.name} (ID: ${id}) with limit: ${limit}`);
+
+      // Fetch jobs from Moonraker API
+      const response = await axios.get(`${printer.ipAddress}/server/history/list`, {
+        params: { limit },
+        timeout: 30000, // 30 second timeout
+      });
+
+      const jobs = response.data?.result?.jobs;
+
+      if (!Array.isArray(jobs)) {
+        throw new Error('Invalid API response: jobs array not found');
+      }
+
+      this.logger.log(`Received ${jobs.length} jobs from printer ${printer.name}`);
+
+      // Process jobs in a transaction for atomicity
+      await this.dataSource.transaction(async (manager) => {
+        // Fetch all existing jobs for this printer in bulk
+        const existingJobs = await manager.find(Job, {
+          where: { printer: { id } },
+          select: ['id', 'job_id', 'status'],
         });
 
-        if (!existingJob) {
-          jobData.printer = printer;
-          const newJob = this.jobRepository.create(jobData);
-          await this.jobRepository.save(newJob);
-        } else if (existingJob.status !== jobData.status) {
-          console.log(`Updating job ${jobData.job_id} status from ${existingJob.status} to ${jobData.status}`);
-          await this.jobRepository.update(existingJob.id, {
-            ...existingJob,
-            ...jobData,
-          });
-        } else {
-          console.log(`Job with jobId ${jobData.job_id} already exists with same status. Skipping.`);
+        // Create a map for quick lookups
+        const existingJobsMap = new Map(
+          existingJobs.map(job => [job.job_id, job])
+        );
+
+        const jobsToInsert: Partial<Job>[] = [];
+        const jobsToUpdate: Array<{ id: number; data: Partial<Job> }> = [];
+
+        for (const jobData of jobs) {
+          result.totalProcessed++;
+
+          try {
+            // Validate required fields
+            if (!jobData.job_id) {
+              result.jobsFailed++;
+              result.errors.push({
+                job_id: 'unknown',
+                error: 'Missing job_id in API response',
+              });
+              continue;
+            }
+
+            const existingJob = existingJobsMap.get(jobData.job_id);
+
+            if (!existingJob) {
+              // New job - prepare for bulk insert
+              jobsToInsert.push({
+                job_id: jobData.job_id,
+                printer_id: jobData.printer_id,
+                user: jobData.user,
+                filename: jobData.filename,
+                status: jobData.status,
+                start_time: jobData.start_time,
+                end_time: jobData.end_time,
+                print_duration: jobData.print_duration,
+                total_duration: jobData.total_duration,
+                filament_used: jobData.filament_used,
+                metadata: jobData.metadata,
+                auxiliaryData: jobData.auxiliary_data,
+                exists: jobData.exists,
+                printer: printer,
+              });
+              result.jobsAdded++;
+            } else if (this.hasJobChanged(existingJob, jobData)) {
+              // Existing job with changes - prepare for bulk update
+              jobsToUpdate.push({
+                id: existingJob.id,
+                data: {
+                  printer_id: jobData.printer_id,
+                  user: jobData.user,
+                  filename: jobData.filename,
+                  status: jobData.status,
+                  start_time: jobData.start_time,
+                  end_time: jobData.end_time,
+                  print_duration: jobData.print_duration,
+                  total_duration: jobData.total_duration,
+                  filament_used: jobData.filament_used,
+                  metadata: jobData.metadata,
+                  auxiliaryData: jobData.auxiliary_data,
+                  exists: jobData.exists,
+                },
+              });
+              result.jobsUpdated++;
+              this.logger.debug(
+                `Job ${jobData.job_id} will be updated (status: ${existingJob.status} → ${jobData.status})`
+              );
+            } else {
+              // No changes needed
+              result.jobsSkipped++;
+            }
+          } catch (jobError) {
+            result.jobsFailed++;
+            result.errors.push({
+              job_id: jobData.job_id || 'unknown',
+              error: jobError.message,
+            });
+            this.logger.error(`Error processing job ${jobData.job_id}:`, jobError);
+          }
         }
-      }
+
+        // Bulk insert new jobs
+        if (jobsToInsert.length > 0) {
+          try {
+            await manager.save(Job, jobsToInsert);
+            this.logger.log(`Successfully inserted ${jobsToInsert.length} new jobs`);
+          } catch (insertError) {
+            this.logger.error('Error during bulk insert:', insertError);
+
+            // If bulk insert fails (e.g., due to unique constraint), try individual inserts
+            this.logger.warn('Attempting individual inserts as fallback...');
+            for (const job of jobsToInsert) {
+              try {
+                await manager.save(Job, job);
+              } catch (individualError) {
+                result.jobsAdded--;
+                result.jobsFailed++;
+                result.errors.push({
+                  job_id: job.job_id || 'unknown',
+                  error: `Insert failed: ${individualError.message}`,
+                });
+              }
+            }
+          }
+        }
+
+        // Bulk update existing jobs
+        if (jobsToUpdate.length > 0) {
+          for (const { id, data } of jobsToUpdate) {
+            try {
+              await manager.update(Job, id, data);
+            } catch (updateError) {
+              result.jobsUpdated--;
+              result.jobsFailed++;
+              result.errors.push({
+                job_id: data.job_id || 'unknown',
+                error: `Update failed: ${updateError.message}`,
+              });
+              this.logger.error(`Error updating job ID ${id}:`, updateError);
+            }
+          }
+          this.logger.log(`Successfully updated ${jobsToUpdate.length} jobs`);
+        }
+      });
+
+      result.success = result.jobsFailed === 0;
+
+      this.logger.log(
+        `Job sync completed for printer ${printer.name}: ` +
+        `${result.jobsAdded} added, ${result.jobsUpdated} updated, ` +
+        `${result.jobsSkipped} skipped, ${result.jobsFailed} failed`
+      );
+
+      return result;
     } catch (error) {
-      console.error('Error fetching jobs from printer:', error);
+      this.logger.error(`Error fetching jobs from printer ID ${id}:`, error);
+      result.success = false;
+      result.errors.push({
+        job_id: 'N/A',
+        error: `Critical error: ${error.message}`,
+      });
+      return result;
     }
+  }
+
+  /**
+   * Helper method to determine if a job has changed and needs updating
+   */
+  private hasJobChanged(existingJob: Partial<Job>, newJobData: any): boolean {
+    return (
+      existingJob.status !== newJobData.status ||
+      existingJob.end_time !== newJobData.end_time ||
+      existingJob.print_duration !== newJobData.print_duration ||
+      existingJob.filament_used !== newJobData.filament_used
+    );
   }
 
 

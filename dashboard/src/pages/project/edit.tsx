@@ -13,7 +13,7 @@ export const ProjectEdit = () => {
     }); */
 
     const { selectProps: clientSelectProps } = useSelect<IClient>({
-        resource: "client",
+        resource: "clients",
         optionLabel: "name",
     });
 

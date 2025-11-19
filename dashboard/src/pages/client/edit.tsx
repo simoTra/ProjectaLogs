@@ -8,7 +8,7 @@ export const ClientEdit = () => {
     const clientData = query?.data?.data;
 
     const { selectProps: projectsSelectProps } = useSelect<IProject>({
-        resource: "project",
+        resource: "projects",
         defaultValue: clientData?.projects?.map((item: IProject) => item?.id),
         optionLabel: "name",
     });

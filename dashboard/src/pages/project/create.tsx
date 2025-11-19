@@ -6,7 +6,7 @@ export const ProjectCreate = () => {
   const { formProps, saveButtonProps } = useForm();
 
   const { selectProps: clientSelectProps } = useSelect<IClient>({
-    resource: "client",
+    resource: "clients",
     optionLabel: "name",
   });
 

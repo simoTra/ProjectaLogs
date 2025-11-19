@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Printer } from 'src/printers/entities/printer.entity';
 import { Project } from 'src/projects/entities/project.entity';
-import { PrimaryGeneratedColumn, Column, Entity, ManyToOne } from 'typeorm';
+import { PrimaryGeneratedColumn, Column, Entity, ManyToOne, Index } from 'typeorm';
 
 export class Thumbnail {
   @ApiProperty({required: false}) width: number;
@@ -43,6 +43,7 @@ export class AuxiliaryData {
 }
 
 @Entity()
+@Index(['job_id', 'printer'], { unique: true })
 export class Job {
   @PrimaryGeneratedColumn()
   @ApiProperty()

@@ -7,7 +7,7 @@ export const PrinterCreate = () => {
   const { formProps, saveButtonProps, query } = useForm();
 
   const { selectProps: jobsSelectProps } = useSelect<IJob>({
-    resource: "job",
+    resource: "jobs",
     optionLabel: "filename",
   });
 

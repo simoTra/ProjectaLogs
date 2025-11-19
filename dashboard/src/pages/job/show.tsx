@@ -55,7 +55,7 @@ export const JobShow = () => {
       {thumbnail && record?.id && (
         <div>
           <img
-            src={`${API_URL}/job/thumbnail/${record.id}?path=${encodeURIComponent(thumbnail.relative_path)}`}
+            src={`${API_URL}/jobs/thumbnail/${record.id}?path=${encodeURIComponent(thumbnail.relative_path)}`}
             alt="Job thumbnail"
             style={{ width: 320, height: 320, borderRadius: 4 }}
             title="Thumbnail"
