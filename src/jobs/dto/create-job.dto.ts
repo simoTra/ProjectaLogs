@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNumber, IsOptional, IsPositive, IsString, IsObject } from 'class-validator';
+import { IsNumber, IsOptional, IsPositive, IsString, IsObject, IsArray, IsBoolean } from 'class-validator';
 
 export class CreateJobDto {
   @IsOptional()
@@ -16,6 +16,11 @@ export class CreateJobDto {
   @IsString()
   @ApiProperty({ type: "string", required: false })
   job_id?: string;
+
+  @IsOptional()
+  @IsString()
+  @ApiProperty({ type: "string", required: false })
+  user?: string;
 
   @IsOptional()
   @IsString()
@@ -41,7 +46,7 @@ export class CreateJobDto {
   @IsNumber()
   @ApiProperty({ type: "number", required: false })
   print_duration?: number;
-  
+
   @IsOptional()
   @IsNumber()
   @IsPositive()
@@ -52,18 +57,18 @@ export class CreateJobDto {
   @IsNumber()
   @ApiProperty({ type: "number", required: false })
   filament_used?: number;
-  
+
   @IsOptional()
   @IsNumber()
   @IsPositive()
   @ApiProperty({ type: "number", required: false })
   filament?: number;
-  
+
   @IsOptional()
   @IsString()
   @ApiProperty({ type: "string", required: false })
   filament_type?: string;
-  
+
   @IsOptional()
   @IsNumber()
   @IsPositive()
@@ -74,4 +79,14 @@ export class CreateJobDto {
   @IsObject()
   @ApiProperty({ required: false })
   metadata?: any;
+
+  @IsOptional()
+  @IsArray()
+  @ApiProperty({ required: false, type: [Object] })
+  auxiliaryData?: any[];
+
+  @IsOptional()
+  @IsBoolean()
+  @ApiProperty({ type: "boolean", required: false })
+  exists?: boolean;
 }

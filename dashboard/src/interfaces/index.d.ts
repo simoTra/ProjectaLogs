@@ -6,7 +6,7 @@ export interface IClient {
 
 export interface IJob {
   id: number;
-  jobId: string;
+  job_id?: string;
   user?: string;
   filename?: string;
   status?: string;
@@ -42,7 +42,7 @@ export interface IJob {
       relative_path: string;
     }[];
   };
-  auxiliary_data?: {
+  auxiliaryData?: {
     provider?: string;
     name?: string;
     value?: number[];

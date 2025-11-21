@@ -7,7 +7,7 @@ export class Thumbnail {
   @ApiProperty({required: false}) width: number;
   @ApiProperty({required: false}) height: number;
   @ApiProperty({required: false}) size: number;
-  @ApiProperty({required: false}) relativePath: string;
+  @ApiProperty({required: false}) relative_path: string;
 }
 
 export class Metadata {

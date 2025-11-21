@@ -4,19 +4,32 @@ import { Repository } from 'typeorm';
 import { CreateJobDto } from './dto/create-job.dto';
 import { UpdateJobDto } from './dto/update-job.dto';
 import { Job } from './entities/job.entity';
-import axios from 'axios';
+import { Project } from '../projects/entities/project.entity';
+import { Printer } from '../printers/entities/printer.entity';
 import { SearchJob } from './dto/search-job';
-import { endOfMonth, startOfMonth, subMonths } from 'date-fns';
 
 @Injectable()
 export class JobsService {
   constructor(
     @InjectRepository(Job)
     private readonly jobRepository: Repository<Job>,
+    @InjectRepository(Project)
+    private readonly projectRepository: Repository<Project>,
+    @InjectRepository(Printer)
+    private readonly printerRepository: Repository<Printer>,
   ) {}
 
-  create(jobData: CreateJobDto): Promise<Job> {
+  async create(jobData: CreateJobDto): Promise<Job> {
     const job = this.jobRepository.create(jobData);
+
+    if (jobData.projectId) {
+      job.project = await this.projectRepository.findOne({ where: { id: jobData.projectId } });
+    }
+
+    if (jobData.printer_id) {
+      job.printer = await this.printerRepository.findOne({ where: { id: parseInt(jobData.printer_id) } });
+    }
+
     return this.jobRepository.save(job);
   }
 
