@@ -58,6 +58,12 @@ export class PrintersController {
     return this.printersService.findAll();
   }
 
+  @Get(':id/validate')
+  async validatePrinter(@Param('id', ParseIntPipe) id: number) {
+    const printer = await this.printersService.findOne(id);
+    return { id: printer.id, name: printer.name, valid: true };
+  }
+
   @Get(':id')
   findOne(@Param('id', ParseIntPipe) id: number): Promise<Printer> {
     return this.printersService.findOne(id);

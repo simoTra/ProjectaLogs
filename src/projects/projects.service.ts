@@ -188,8 +188,8 @@ export class ProjectsService {
         id: project.id,
         name: project.name,
         description: project.description,
-        clientName: project.client.name,
-        jobsCount: project.jobs.length,
+        clientName: project.client?.name ?? 'No Client',
+        jobsCount: project.jobs?.length ?? 0,
       }
     });
     return projectsForPrinter;

@@ -1,3 +1,24 @@
 [projectalogs]
-backend_endpoint: http://localhost:3000
+backend_endpoint: http://backend:4499
 printer_id: 1
+
+# ============================================================================
+# INSTALLATION
+# ============================================================================
+# 1. Copy projectalogs.py to ~/moonraker/moonraker/components/
+# 2. Add the [projectalogs] section to your moonraker.conf
+# 3. Create a printer in ProjectaLogs dashboard and note its ID
+# 4. Restart Moonraker
+# 5. Verify: curl http://your-printer:7125/server/projectalogs/status
+
+# ============================================================================
+# TROUBLESHOOTING
+# ============================================================================
+# "Printer not validated":
+#   - Create printer in dashboard first, use its ID in printer_id
+# Jobs not created:
+#   - Check printer_id matches dashboard ID
+#   - Check Moonraker logs: tail -f ~/printer_data/logs/moonraker.log | grep ProjectaLogs
+# Backend unreachable:
+#   - Verify backend_endpoint URL
+#   - Test: curl http://backend:4499/api/health
